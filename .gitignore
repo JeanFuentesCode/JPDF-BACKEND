@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+
+# Archivos temporales y de salida
+uploads/
+outputs/
+*.log
+*.pdf
+*.zip
+result.pdf
+resultados.zip
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
