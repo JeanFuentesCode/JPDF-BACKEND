@@ -6,6 +6,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const upload = require('./middlewares/upload');
 const pdfController = require('./controllers/pdfController');
+const previewController = require('./controllers/previewController');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,7 +22,7 @@ app.use(express.json());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 200,
   message: 'Demasiadas peticiones, intenta más tarde.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -34,6 +35,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.post('/api/process', upload.array('pdfs', 50), pdfController.process);
+app.post('/api/preview', upload.array('pdfs', 1), previewController.preview);
 app.get('/api/download/:fileName', pdfController.download);
 
 // Manejo de errores
@@ -44,7 +46,4 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
-
-app.post('/api/preview', upload.array('pdfs', 1), previewController.preview);
-  
 });
