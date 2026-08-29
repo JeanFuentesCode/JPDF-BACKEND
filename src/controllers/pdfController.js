@@ -19,7 +19,6 @@ exports.process = async (req, res, next) => {
 
     const processedFiles = await processPdfs(pdfBuffers, options);
 
-    // Si es un solo archivo, devolver PDF directo
     if (processedFiles.length === 1) {
       const file = processedFiles[0];
       const outputName = file.suggestedName || `procesado_${Date.now()}.pdf`;
@@ -28,7 +27,6 @@ exports.process = async (req, res, next) => {
       return res.send(file.outputBuffer);
     }
 
-    // Si son varios, crear ZIP
     const zipFiles = processedFiles.map((file, index) => ({
       filename: file.suggestedName || `procesado_${index + 1}.pdf`,
       data: file.outputBuffer,
