@@ -35,7 +35,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.post('/api/process', upload.array('pdfs', 50), pdfController.process);
-app.post('/api/preview', upload.array('pdfs', 1), previewController.preview);
+app.post('/api/preview', upload.any(), previewController.preview);
 app.get('/api/download/:fileName', pdfController.download);
 
 // Manejo de errores
