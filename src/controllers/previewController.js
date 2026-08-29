@@ -1,3 +1,4 @@
+const sharp = require('sharp');
 const { pdfBufferToImages } = require('../services/imageService');
 const { detectAndRotate } = require('../services/rotationService');
 const { cleanImage } = require('../services/cleanerService');
@@ -6,10 +7,9 @@ const { isBlankPage } = require('../services/blankPageDetector');
 exports.preview = async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'No se subieron archivos' });
+      return res.status(400).json({ error: 'No se subió ningún archivo' });
     }
 
-    // Solo se permite un PDF para vista previa
     const pdfBuffer = req.files[0].buffer;
     const options = {
       autoRotate: req.body.autoRotate === 'true',
@@ -17,8 +17,9 @@ exports.preview = async (req, res, next) => {
       detectBlank: req.body.detectBlank !== 'false',
     };
 
-    // Convertir a imágenes
-    const imageBuffers = await pdfBufferToImages(pdfBuffer, 1.5); // escala menor para velocidad
+    // Convertir PDF a imágenes (escala menor para velocidad)
+    const imageBuffers = await pdfBufferToImages(pdfBuffer, 1.5);
+
     const pages = [];
     const blankPages = [];
     const appliedAngles = [];
@@ -27,24 +28,27 @@ exports.preview = async (req, res, next) => {
       let buf = imageBuffers[i];
       let angle = 0;
 
+      // Rotación automática si está activada
       if (options.autoRotate) {
         const rotResult = await detectAndRotate(buf);
         buf = rotResult.buffer;
         angle = rotResult.angle;
       }
 
+      // Limpieza si está activada
       if (options.clean) {
         buf = await cleanImage(buf);
       }
 
+      // Detección de páginas en blanco
       if (options.detectBlank !== false) {
         if (await isBlankPage(buf)) {
           blankPages.push(i + 1);
         }
       }
 
-      // Convertir a JPEG base64 para enviar al frontend
-      const jpegBuffer = await require('sharp')(buf).jpeg({ quality: 70 }).toBuffer();
+      // Convertir a JPEG base64 para mostrar en frontend
+      const jpegBuffer = await sharp(buf).jpeg({ quality: 60 }).toBuffer();
       pages.push({
         pageNumber: i + 1,
         image: `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`,
