@@ -10,12 +10,12 @@ const pdfController = require('./controllers/pdfController');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Configuración para proxies (Render)
+app.set('trust proxy', 1);
+
 // Seguridad
 app.use(helmet());
-
-// CORS abierto para desarrollo (luego restringir al dominio del frontend)
 app.use(cors());
-
 app.use(express.json());
 
 // Rate limiting
@@ -23,6 +23,8 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   message: 'Demasiadas peticiones, intenta más tarde.',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use('/api', limiter);
 
