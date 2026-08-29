@@ -14,6 +14,7 @@ exports.process = async (req, res, next) => {
       clean: req.body.clean === 'true',
       detectBlank: req.body.detectBlank !== 'false',
       namingTemplate: req.body.namingTemplate || null,
+      manualRotations: req.body.manualRotations ? JSON.parse(req.body.manualRotations) : {},
     };
 
     const processedFiles = await processPdfs(pdfBuffers, options);
