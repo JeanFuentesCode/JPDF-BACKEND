@@ -10,7 +10,13 @@ exports.preview = async (req, res, next) => {
       return res.status(400).json({ error: 'No se subió ningún archivo' });
     }
 
-    const pdfBuffer = req.files[0].buffer;
+    // Buscar el primer archivo PDF sin importar el nombre del campo
+    const file = req.files.find(f => f.mimetype === 'application/pdf');
+    if (!file) {
+      return res.status(400).json({ error: 'No se encontró archivo PDF' });
+    }
+
+    const pdfBuffer = file.buffer;
     const options = {
       autoRotate: req.body.autoRotate === 'true',
       clean: req.body.clean === 'true',
